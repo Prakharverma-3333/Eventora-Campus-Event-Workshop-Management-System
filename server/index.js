@@ -7,7 +7,7 @@ const authRoutes = require('./routes/auth.js');
 const eventRoutes = require('./routes/events.js');
 const bookingRoutes = require('./routes/booking.js');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 app.use(cors());
@@ -22,14 +22,16 @@ app.use('/api/bookings', bookingRoutes);
 const clientBuildPath = path.join(__dirname, '../client/dist');
 app.use(express.static(clientBuildPath));
 
-app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
+// Catch-all SPA fallback for Express 5
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    return res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
       if (err) {
         res.status(500).send("Frontend build index.html not found. Run 'npm run build' in client folder.");
       }
     });
   }
+  next();
 });
 
 // Connect to MongoDB
