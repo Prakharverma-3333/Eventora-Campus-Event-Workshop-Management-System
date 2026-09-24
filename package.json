@@ -4,7 +4,7 @@
   "description": "Eventora - Campus Event & Workshop Management System",
   "private": true,
   "scripts": {
-    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
+    "build": "npm --prefix client install --include=dev && npm --prefix client run build && npm --prefix server install",
     "start": "node server/index.js",
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan.bold,magenta.bold\" \"npm run server\" \"npm run client\"",
     "server": "npm --prefix server start",
