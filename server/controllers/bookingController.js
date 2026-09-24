@@ -13,7 +13,10 @@ exports.sendBookingOTP = async (req, res) => {
 
         await OTP.create({ email: req.user.email, otp, action: 'event_booking' });
 
-        await sendOTPEmail(req.user.email, otp, 'event_booking');
+        // Dispatch email asynchronously without blocking the user response
+        sendOTPEmail(req.user.email, otp, 'event_booking').catch(err => {
+            console.error('Background booking OTP email send error:', err);
+        });
         res.json({ message: 'OTP sent successfully' });
     }
     catch (error) {

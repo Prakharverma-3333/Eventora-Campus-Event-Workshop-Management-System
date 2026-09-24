@@ -45,7 +45,11 @@ exports.registerUser = async (req, res) => {
         console.log(`OTP for ${email}: ${otp}`);
 
         await OTP.create({ email, otp, action: 'account_verification' });
-        await sendOTPEmail(email, otp, 'account_verification');
+        
+        // Dispatch email asynchronously without blocking the user response
+        sendOTPEmail(email, otp, 'account_verification').catch(err => {
+            console.error('Background OTP email send error:', err);
+        });
 
         res.status(201).json({
             message: 'User registered successfully. Please check your email for OTP to verify your account.',
@@ -86,7 +90,11 @@ exports.loginUser = async (req, res) => {
 
             await OTP.deleteMany({ email, action: 'account_verification' });//Remove old otps
             await OTP.create({ email, otp, action: 'account_verification' });
-            await sendOTPEmail(email, otp, 'account_verification');
+            
+            // Dispatch email asynchronously without blocking the response
+            sendOTPEmail(email, otp, 'account_verification').catch(err => {
+                console.error('Background OTP email send error:', err);
+            });
 
             return res.status(400).json({
                 needsVerification: true,
