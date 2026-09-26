@@ -17,7 +17,7 @@ exports.sendBookingOTP = async (req, res) => {
         sendOTPEmail(req.user.email, otp, 'event_booking').catch(err => {
             console.error('Background booking OTP email send error:', err);
         });
-        res.json({ message: 'OTP sent successfully' });
+        res.json({ message: 'OTP sent successfully', devOtp: otp });
     }
     catch (error) {
         res.status(500).json({ message: 'Error sending OTP', error: error.message });

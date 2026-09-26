@@ -34,7 +34,12 @@ const Login = () => {
         } catch (err) {
             if (err?.needsVerification) {
                 setShowOTP(true);
-                setError(err.message || 'Account not verified. A new OTP has been sent to your email.');
+                if (err?.devOtp) {
+                    setError(`Account not verified. Your OTP Code is: ${err.devOtp}`);
+                    setOtp(err.devOtp);
+                } else {
+                    setError(err.message || 'Account not verified. A new OTP has been sent to your email.');
+                }
             } else {
                 setError(typeof err === 'string' ? err : (err?.message || err?.error || 'Login failed'));
             }

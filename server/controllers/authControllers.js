@@ -53,6 +53,7 @@ exports.registerUser = async (req, res) => {
 
         res.status(201).json({
             message: 'User registered successfully. Please check your email for OTP to verify your account.',
+            devOtp: otp,
             email: user.email
         });
     } catch (error) {
@@ -99,7 +100,8 @@ exports.loginUser = async (req, res) => {
             return res.status(400).json({
                 needsVerification: true,
                 message: 'Account not verified. A new OTP has been sent to your email.',
-                error: 'Account not verified. A new OTP has been sent to your email.'
+                error: 'Account not verified. A new OTP has been sent to your email.',
+                devOtp: otp
             });
         }
 

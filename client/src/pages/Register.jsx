@@ -35,7 +35,12 @@ const Register = () => {
             if (!showOTP) {
                 const res = await register(name, email, password, role);
                 setShowOTP(true);
-                setSuccessMessage(res.message || 'An OTP has been sent to your email. Please verify your account.');
+                if (res?.devOtp) {
+                    setSuccessMessage(`User registered! Your OTP Code is: ${res.devOtp}`);
+                    setOtp(res.devOtp); // Auto-fill for ultra-smooth experience!
+                } else {
+                    setSuccessMessage(res?.message || 'An OTP has been sent to your email. Please verify your account.');
+                }
             } else {
                 const user = await verifyOTP(email, otp);
                 if (user?.role === 'admin') {
@@ -57,7 +62,12 @@ const Register = () => {
         setSuccessMessage('');
         try {
             const res = await register(name, email, password, role);
-            setSuccessMessage(res.message || 'A new OTP has been sent to your email.');
+            if (res?.devOtp) {
+                setSuccessMessage(`New OTP Code: ${res.devOtp}`);
+                setOtp(res.devOtp);
+            } else {
+                setSuccessMessage(res?.message || 'A new OTP has been sent to your email.');
+            }
         } catch (err) {
             setError(typeof err === 'string' ? err : (err.message || 'Failed to resend OTP'));
         } finally {
