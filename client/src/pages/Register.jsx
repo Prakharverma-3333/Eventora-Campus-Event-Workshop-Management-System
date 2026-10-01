@@ -35,12 +35,7 @@ const Register = () => {
             if (!showOTP) {
                 const res = await register(name, email, password, role);
                 setShowOTP(true);
-                if (res?.devOtp) {
-                    setSuccessMessage(`User registered! Your OTP Code is: ${res.devOtp}`);
-                    setOtp(res.devOtp); // Auto-fill for ultra-smooth experience!
-                } else {
-                    setSuccessMessage(res?.message || 'An OTP has been sent to your email. Please verify your account.');
-                }
+                setSuccessMessage(res.message || 'An OTP has been sent to your email. Please verify your account.');
             } else {
                 const user = await verifyOTP(email, otp);
                 if (user?.role === 'admin') {
@@ -62,12 +57,7 @@ const Register = () => {
         setSuccessMessage('');
         try {
             const res = await register(name, email, password, role);
-            if (res?.devOtp) {
-                setSuccessMessage(`New OTP Code: ${res.devOtp}`);
-                setOtp(res.devOtp);
-            } else {
-                setSuccessMessage(res?.message || 'A new OTP has been sent to your email.');
-            }
+            setSuccessMessage(res.message || 'A new OTP has been sent to your email.');
         } catch (err) {
             setError(typeof err === 'string' ? err : (err.message || 'Failed to resend OTP'));
         } finally {
@@ -79,9 +69,8 @@ const Register = () => {
         <div className="max-w-md mx-auto mt-14 bg-white p-8 rounded-xl shadow-xl border border-gray-100">
             {/* Header Badge */}
             <div className="text-center mb-6">
-                <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${
-                    isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'
-                }`}>
+                <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'
+                    }`}>
                     {isAdmin ? <FaUserShield className="text-amber-600 text-sm" /> : <FaUser className="text-indigo-600 text-sm" />}
                     <span>{isAdmin ? 'Admin Registration' : 'User Registration'}</span>
                 </div>
@@ -170,25 +159,24 @@ const Register = () => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className={`w-full text-white font-bold py-3 rounded-lg focus:ring-4 transition shadow-md cursor-pointer ${
-                        isAdmin
+                    className={`w-full text-white font-bold py-3 rounded-lg focus:ring-4 transition shadow-md cursor-pointer ${isAdmin
                             ? 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-200'
                             : 'bg-gray-900 hover:bg-black focus:ring-gray-200'
-                    }`}
+                        }`}
                 >
                     {loading
                         ? 'Processing...'
                         : showOTP
-                        ? 'Verify & Complete'
-                        : 'Sign Up'}
+                            ? 'Verify & Complete'
+                            : 'Sign Up'}
                 </button>
             </form>
 
             {!showOTP && (
                 <p className="text-center mt-6 text-sm text-gray-600">
                     Already have an account?{' '}
-                    <Link 
-                        to={isAdmin ? '/login?role=admin' : '/login?role=user'} 
+                    <Link
+                        to={isAdmin ? '/login?role=admin' : '/login?role=user'}
                         className="text-gray-900 font-bold hover:underline"
                     >
                         Sign In

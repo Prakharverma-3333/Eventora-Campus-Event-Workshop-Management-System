@@ -34,12 +34,7 @@ const Login = () => {
         } catch (err) {
             if (err?.needsVerification) {
                 setShowOTP(true);
-                if (err?.devOtp) {
-                    setError(`Account not verified. Your OTP Code is: ${err.devOtp}`);
-                    setOtp(err.devOtp);
-                } else {
-                    setError(err.message || 'Account not verified. A new OTP has been sent to your email.');
-                }
+                setError(err.message || 'Account not verified. A new OTP has been sent to your email.');
             } else {
                 setError(typeof err === 'string' ? err : (err?.message || err?.error || 'Login failed'));
             }
@@ -52,9 +47,8 @@ const Login = () => {
         <div className="max-w-md mx-auto mt-14 bg-white p-8 rounded-xl shadow-xl border border-gray-100">
             {/* Header Badge */}
             <div className="text-center mb-6">
-                <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${
-                    isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'
-                }`}>
+                <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'
+                    }`}>
                     {isAdmin ? <FaUserShield className="text-amber-600 text-sm" /> : <FaUser className="text-indigo-600 text-sm" />}
                     <span>{isAdmin ? 'Admin Portal' : 'User Portal'}</span>
                 </div>
@@ -115,25 +109,24 @@ const Login = () => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className={`w-full text-white font-bold py-3 rounded-lg focus:ring-4 transition shadow-md cursor-pointer ${
-                        isAdmin
+                    className={`w-full text-white font-bold py-3 rounded-lg focus:ring-4 transition shadow-md cursor-pointer ${isAdmin
                             ? 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-200'
                             : 'bg-gray-900 hover:bg-black focus:ring-gray-200'
-                    }`}
+                        }`}
                 >
                     {loading
                         ? 'Processing...'
                         : showOTP
-                        ? 'Verify OTP & Log In'
-                        : 'Sign In'}
+                            ? 'Verify OTP & Log In'
+                            : 'Sign In'}
                 </button>
             </form>
 
             {!isAdmin && (
                 <p className="text-center mt-6 text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link 
-                        to="/register?role=user" 
+                    <Link
+                        to="/register?role=user"
                         className="text-gray-900 font-bold hover:underline"
                     >
                         Sign Up
