@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
+const axios = require('axios');
 const { Resend } = require('resend');
 
 dotenv.config();
@@ -23,26 +24,54 @@ const sendBookingEmail = async (userEmail, userName, eventTitle) => {
             <p>Thank you for choosing Eventora.</p>
         `;
 
+        // 1. Brevo API (Sends to ANY email address over HTTPS without custom domain!)
+        if (process.env.BREVO_API_KEY) {
+            const senderEmail = process.env.EMAIL_USER || 'prakharv824@gmail.com';
+            const response = await axios.post(
+                'https://api.brevo.com/v3/smtp/email',
+                {
+                    sender: { name: 'Eventora', email: senderEmail },
+                    to: [{ email: userEmail }],
+                    subject: title,
+                    htmlContent: html
+                },
+                {
+                    headers: {
+                        'api-key': process.env.BREVO_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            console.log(`[BREVO SUCCESS] Booking email sent to ${userEmail}:`, response.data);
+            return;
+        }
+
+        // 2. Resend API
         if (resend) {
-            await resend.emails.send({
+            const { data, error } = await resend.emails.send({
                 from: 'Eventora <onboarding@resend.dev>',
                 to: userEmail,
                 subject: title,
                 html: html
             });
-            console.log(`[RESEND] Booking confirmation email sent to ${userEmail}`);
+            if (error) {
+                console.error(`[RESEND ERROR] Failed to send booking email to ${userEmail}:`, error);
+            } else {
+                console.log(`[RESEND SUCCESS] Booking email sent to ${userEmail}:`, data);
+            }
             return;
         }
 
+        // 3. Nodemailer Gmail (Localhost)
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: userEmail,
             subject: title,
             html: html
         });
-        console.log('Email sent successfully to', userEmail);
+        console.log('[NODEMAILER] Email sent successfully to', userEmail);
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('Error sending booking email:', error.response?.data || error.message);
     }
 };
 
@@ -64,19 +93,45 @@ const sendOTPEmail = async (userEmail, otp, type) => {
             </div>
         `;
 
-        // 1. If RESEND_API_KEY is configured (Uses HTTPS port 443 - works on Render Free Tier!)
+        // 1. Brevo API (Sends to ANY email address over HTTPS without requiring custom domain)
+        if (process.env.BREVO_API_KEY) {
+            const senderEmail = process.env.EMAIL_USER || 'prakharv824@gmail.com';
+            const response = await axios.post(
+                'https://api.brevo.com/v3/smtp/email',
+                {
+                    sender: { name: 'Eventora', email: senderEmail },
+                    to: [{ email: userEmail }],
+                    subject: `${title} - Code: ${otp}`,
+                    htmlContent: html
+                },
+                {
+                    headers: {
+                        'api-key': process.env.BREVO_API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            console.log(`[BREVO SUCCESS] OTP sent to ${userEmail} for ${type}:`, response.data);
+            return;
+        }
+
+        // 2. Resend API
         if (resend) {
-            await resend.emails.send({
+            const { data, error } = await resend.emails.send({
                 from: 'Eventora <onboarding@resend.dev>',
                 to: userEmail,
                 subject: `${title} - Code: ${otp}`,
                 html: html
             });
-            console.log(`[RESEND HTTP] OTP sent to ${userEmail} for ${type}`);
+            if (error) {
+                console.error(`[RESEND ERROR] Failed to send OTP to ${userEmail}:`, error);
+            } else {
+                console.log(`[RESEND SUCCESS] OTP sent to ${userEmail} for ${type}:`, data);
+            }
             return;
         }
 
-        // 2. Otherwise use Nodemailer with Gmail (Localhost)
+        // 3. Nodemailer Gmail (Localhost)
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: userEmail,
@@ -86,7 +141,7 @@ const sendOTPEmail = async (userEmail, otp, type) => {
         await transporter.sendMail(mailOptions);
         console.log(`[NODEMAILER] OTP sent to ${userEmail} for ${type}`);
     } catch (error) {
-        console.error('Error sending OTP email:', error);
+        console.error('Error sending OTP email:', error.response?.data || error.message);
     }
 };
 
