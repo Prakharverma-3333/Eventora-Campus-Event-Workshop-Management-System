@@ -21,7 +21,7 @@ const sendBookingEmail = async (userEmail, userName, eventTitle) => {
             <p>Thank you for choosing Eventora.</p>
         `;
 
-        // 1. Brevo REST API (Over HTTPS port 443 — works on Render to ANY email address)
+        // 1. Brevo API (For Render - works over HTTPS to ANY email address)
         if (process.env.BREVO_API_KEY) {
             const senderEmail = process.env.EMAIL_USER || 'prakharv824@gmail.com';
             const response = await axios.post(
@@ -74,7 +74,7 @@ const sendOTPEmail = async (userEmail, otp, type) => {
             </div>
         `;
 
-        // 1. Brevo REST API (Over HTTPS port 443 — works on Render to ANY email address)
+        // 1. Brevo API (For Render - works over HTTPS to ANY email address)
         if (process.env.BREVO_API_KEY) {
             const senderEmail = process.env.EMAIL_USER || 'prakharv824@gmail.com';
             const response = await axios.post(
@@ -92,7 +92,7 @@ const sendOTPEmail = async (userEmail, otp, type) => {
                     }
                 }
             );
-            console.log(`[BREVO SUCCESS] OTP email sent to ${userEmail}:`, response.data);
+            console.log(`[BREVO SUCCESS] OTP sent to ${userEmail} for ${type}:`, response.data);
             return;
         }
 
